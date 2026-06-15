@@ -24,7 +24,7 @@ from ..embed import get_embedder
 from ..vector_index import get_vector_index
 
 
-logger = logging.getLogger("agentyun.memory")
+logger = logging.getLogger("agentcloud.memory")
 router = APIRouter(prefix="/memory", tags=["memory"])
 
 

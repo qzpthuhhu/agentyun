@@ -9,17 +9,17 @@ import tempfile
 import pytest
 
 
-SERVER = os.environ.get("AGENTYUN_SERVER", "http://127.0.0.1:18000")
+SERVER = os.environ.get("AGENTCLOUD_SERVER", "http://127.0.0.1:18000")
 
 
 @pytest.fixture
 def tmp_data_dir():
-    return tempfile.mkdtemp(prefix="agentyun-v03-")
+    return tempfile.mkdtemp(prefix="agentcloud-v03-")
 
 
 def test_share_create_consume_timeline(tmp_data_dir):
     """Owner creates a share, consumer reads the timeline."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/owner", timeout_seconds=60)
     ac = AgentCloud.register(SERVER, label="share-owner", config=cfg)
@@ -40,7 +40,7 @@ def test_share_create_consume_timeline(tmp_data_dir):
 
 def test_share_search_via_token(tmp_data_dir):
     """Consumer can semantic-search owner's memory via share token."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/owner", timeout_seconds=120)
     ac = AgentCloud.register(SERVER, label="share-search", config=cfg)
@@ -58,8 +58,8 @@ def test_share_search_via_token(tmp_data_dir):
 
 def test_share_revoke_blocks_access(tmp_data_dir):
     """Revoking a share should make subsequent reads fail."""
-    from agentyun import AgentCloud, SDKConfig
-    from agentyun.client import APIError
+    from agentcloud import AgentCloud, SDKConfig
+    from agentcloud.client import APIError
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/owner", timeout_seconds=60)
     ac = AgentCloud.register(SERVER, label="share-revoke", config=cfg)
@@ -76,8 +76,8 @@ def test_share_revoke_blocks_access(tmp_data_dir):
 
 def test_share_read_only_blocks_search(tmp_data_dir):
     """'read' permission must NOT allow semantic search."""
-    from agentyun import AgentCloud, SDKConfig
-    from agentyun.client import APIError
+    from agentcloud import AgentCloud, SDKConfig
+    from agentcloud.client import APIError
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/owner", timeout_seconds=60)
     ac = AgentCloud.register(SERVER, label="share-readonly", config=cfg)
@@ -94,7 +94,7 @@ def test_share_read_only_blocks_search(tmp_data_dir):
 
 def test_vector_index_used_for_search(tmp_data_dir):
     """Search should hit the vector index (sqlite-vec or pgvector in dev/prod)."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/vec", timeout_seconds=120)
     ac = AgentCloud.register(SERVER, label="vec-test", config=cfg)
@@ -114,7 +114,7 @@ def test_vector_index_used_for_search(tmp_data_dir):
 
 def test_share_list(tmp_data_dir):
     """Owner can list all active shares."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/list", timeout_seconds=60)
     ac = AgentCloud.register(SERVER, label="share-list", config=cfg)

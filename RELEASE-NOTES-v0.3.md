@@ -1,4 +1,4 @@
-# v0.3.0: Share Tokens + Production-Grade Vector Index
+# v0.3.0 (AgentCloud): Share Tokens + Vector Index
 
 ## What's New
 
@@ -8,12 +8,12 @@ Let specific people/agents read your agent's memory — no account required.
 
 ```bash
 # Owner: create a share
-agentyun share create --permissions read_memory --expires-in 86400 --label for-friend
+agentcloud share create --permissions read_memory --expires-in 86400 --label for-friend
 # Output: a URL-safe token (43 chars)
 
 # Consumer: read the shared memory
-agentyun share consume <TOKEN>
-agentyun share consume <TOKEN> -q "user preferences"
+agentcloud share consume <TOKEN>
+agentcloud share consume <TOKEN> -q "user preferences"
 ```
 
 **Permissions**:
@@ -44,7 +44,7 @@ Server-side search now uses a proper ANN index instead of scanning all events in
 | `sqlite-vec` (default dev) | SQLite mode | 10-100× faster |
 | `pgvector` (default prod) | Postgres | ANN cosine distance |
 
-Auto-detected from `AGENTYUN_DATABASE_URL`. Override with `AGENTYUN_VECTOR_BACKEND`.
+Auto-detected from `AGENTCLOUD_DATABASE_URL`. Override with `AGENTCLOUD_VECTOR_BACKEND`.
 
 ### 🛠 Lightweight Migrations
 

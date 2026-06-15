@@ -18,7 +18,7 @@ from typing import List, Optional, Tuple
 import numpy as np
 
 
-logger = logging.getLogger("agentyun.embed")
+logger = logging.getLogger("agentcloud.embed")
 
 
 # Model choice: small, fast, good quality for short English+Chinese text

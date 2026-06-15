@@ -9,9 +9,9 @@
 #   # Server is on http://127.0.0.1:18000
 #
 # Environment variables consumed by the cloud service:
-#   AGENTYUN_DATABASE_URL=postgresql://agentyun:agentyun@db:5432/agentyun
-#   AGENTYUN_ASSET_STORAGE_DIR=/var/agentyun/assets
-#   AGENTYUN_JWT_SECRET=<change-me>
+#   AGENTCLOUD_DATABASE_URL=postgresql://agentcloud:agentcloud@db:5432/agentcloud
+#   AGENTCLOUD_ASSET_STORAGE_DIR=/var/agentcloud/assets
+#   AGENTCLOUD_JWT_SECRET=<change-me>
 
 version: "3.9"
 
@@ -19,13 +19,13 @@ services:
   db:
     image: pgvector/pgvector:pg16
     environment:
-      POSTGRES_USER: agentyun
-      POSTGRES_PASSWORD: agentyun
-      POSTGRES_DB: agentyun
+      POSTGRES_USER: agentcloud
+      POSTGRES_PASSWORD: agentcloud
+      POSTGRES_DB: agentcloud
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U agentyun"]
+      test: ["CMD-SHELL", "pg_isready -U agentcloud"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -34,8 +34,8 @@ services:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: agentyun
-      MINIO_ROOT_PASSWORD: agentyun-secret
+      MINIO_ROOT_USER: agentcloud
+      MINIO_ROOT_PASSWORD: agentcloud-secret
     volumes:
       - miniodata:/data
     ports:
@@ -49,12 +49,12 @@ services:
       db:
         condition: service_healthy
     environment:
-      AGENTYUN_DATABASE_URL: postgresql://agentyun:agentyun@db:5432/agentyun
-      AGENTYUN_ASSET_STORAGE_DIR: /var/agentyun/assets
-      AGENTYUN_JWT_SECRET: change-me-in-production-please
-      AGENTYUN_DEBUG: "false"
+      AGENTCLOUD_DATABASE_URL: postgresql://agentcloud:agentcloud@db:5432/agentcloud
+      AGENTCLOUD_ASSET_STORAGE_DIR: /var/agentcloud/assets
+      AGENTCLOUD_JWT_SECRET: change-me-in-production-please
+      AGENTCLOUD_DEBUG: "false"
     volumes:
-      - assetdata:/var/agentyun/assets
+      - assetdata:/var/agentcloud/assets
     ports:
       - "18000:8000"
 

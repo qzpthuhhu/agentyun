@@ -1,9 +1,9 @@
-"""agentyun register"""
+"""agentcloud register"""
 import click
 from rich.console import Console
 from rich.panel import Panel
 
-from agentyun import AgentCloud
+from agentcloud import AgentCloud
 
 from ._common import DEFAULT_SERVER, get_config, print_success, print_error
 
@@ -46,5 +46,5 @@ def register_cmd(server: str, label: str | None, data_dir: str | None):
     ))
     console.print()
     console.print("[dim]On another device, run:[/dim]")
-    console.print(f"  agentyun login --key {ac.credentials().key}")
+    console.print(f"  agentcloud login --key {ac.credentials().key}")
     console.print()

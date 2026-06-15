@@ -1,21 +1,21 @@
 [project]
-name = "agentyun"
+name = "agentcloud"
 version = "0.1.0"
-description = "CLI for Agent Cloud Drive"
+description = "CLI for AgentCloud - key-based cloud memory for AI agents"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Agent Cloud", email = "dev@agentyun.dev"}
+    {name = "Agent Cloud", email = "dev@agentcloud.dev"}
 ]
 dependencies = [
-    "agentyun-sdk",
+    "agentcloud-sdk",
     "click>=8.1.0",
     "rich>=13.0.0",
 ]
 
 [project.scripts]
-agentyun = "agentyun_cli.__main__:main"
+agentcloud = "agentcloud_cli.__main__:main"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
@@ -23,4 +23,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["agentyun_cli*"]
+include = ["agentcloud_cli*"]

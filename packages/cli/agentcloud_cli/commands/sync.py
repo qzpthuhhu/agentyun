@@ -1,4 +1,4 @@
-"""agentyun sync ..."""
+"""agentcloud sync ..."""
 import json
 import signal
 import sys
@@ -71,7 +71,7 @@ def sync_daemon(action: str, push_interval: float, pull_interval: float,
             pull_interval=pull_interval,
         )
         print_success(f"Sync daemon started (push={push_interval}s, pull={pull_interval}s)")
-        print_info(f"Daemon running in background thread. Use 'agentyun sync daemon --stop' to stop.")
+        print_info(f"Daemon running in background thread. Use 'agentcloud sync daemon --stop' to stop.")
         # If running in foreground terminal, wait for Ctrl+C
         if sys.stdin.isatty():
             print_info("Press Ctrl+C to stop.")
@@ -94,7 +94,7 @@ def sync_daemon(action: str, push_interval: float, pull_interval: float,
         s = ac.sync.daemon_status()
         if s is None:
             print_info("No daemon has been started in this process.")
-            print_info("Start with: agentyun sync daemon --start")
+            print_info("Start with: agentcloud sync daemon --start")
             return
         import json as _json
         console.print(_json.dumps(s, indent=2, default=str))

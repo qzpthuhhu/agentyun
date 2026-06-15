@@ -5,13 +5,13 @@ from pathlib import Path
 import click
 from rich.console import Console
 
-from agentyun import SDKConfig
+from agentcloud import SDKConfig
 
 
 console = Console()
 
 
-DEFAULT_SERVER = os.environ.get("AGENTYUN_SERVER", "http://127.0.0.1:18000")
+DEFAULT_SERVER = os.environ.get("AGENTCLOUD_SERVER", "http://127.0.0.1:18000")
 
 
 def get_config(server: str, data_dir: str | None = None) -> SDKConfig:
@@ -23,14 +23,14 @@ def get_config(server: str, data_dir: str | None = None) -> SDKConfig:
 
 def require_creds(cfg: SDKConfig):
     """Try to load credentials. Fail with helpful message if missing."""
-    from agentyun import AgentCloud
-    from agentyun.client import AuthError
+    from agentcloud import AgentCloud
+    from agentcloud.client import AuthError
 
     ac = AgentCloud.load(cfg)
     if ac is None:
         raise click.ClickException(
             f"No credentials found at {cfg.credentials_path}.\n"
-            "Run: agentyun register  or  agentyun login --key <KEY>"
+            "Run: agentcloud register  or  agentcloud login --key <KEY>"
         )
     return ac
 

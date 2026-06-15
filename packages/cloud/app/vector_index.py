@@ -6,7 +6,7 @@ v0.3 introduces proper vector indexes:
 - pgvector: Postgres + pgvector extension (production)
 
 The index choice is auto-detected from the database URL but can be overridden
-with AGENTYUN_VECTOR_BACKEND env var.
+with AGENTCLOUD_VECTOR_BACKEND env var.
 
 All implementations expose the same interface:
     index.add(event_id, vector)
@@ -20,7 +20,7 @@ from typing import List, Optional, Tuple
 import numpy as np
 
 
-logger = logging.getLogger("agentyun.vector")
+logger = logging.getLogger("agentcloud.vector")
 
 
 class VectorIndex:
@@ -172,7 +172,7 @@ def get_vector_index(dim: int = 384) -> VectorIndex:
 
     from .config import settings
 
-    backend = os.environ.get("AGENTYUN_VECTOR_BACKEND", "auto").lower()
+    backend = os.environ.get("AGENTCLOUD_VECTOR_BACKEND", "auto").lower()
 
     if backend == "auto":
         # Auto-pick based on DB URL

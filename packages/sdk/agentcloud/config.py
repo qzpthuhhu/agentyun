@@ -6,11 +6,11 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-DEFAULT_DATA_DIR = Path.home() / ".agentyun"
+DEFAULT_DATA_DIR = Path.home() / ".agentcloud"
 
 
 def _data_dir_default() -> Path:
-    env = os.environ.get("AGENTYUN_DATA_DIR")
+    env = os.environ.get("AGENTCLOUD_DATA_DIR")
     if env:
         return Path(env).expanduser()
     return DEFAULT_DATA_DIR
@@ -19,17 +19,17 @@ def _data_dir_default() -> Path:
 class SDKConfig(BaseModel):
     """SDK runtime configuration.
 
-    By default, credentials are stored in ~/.agentyun/credentials.json
-    and local cache in ~/.agentyun/cache.db (SQLite WAL).
+    By default, credentials are stored in ~/.agentcloud/credentials.json
+    and local cache in ~/.agentcloud/cache.db (SQLite WAL).
 
     Override via:
-      - AGENTYUN_DATA_DIR environment variable
-      - AGENTYUN_SERVER environment variable
+      - AGENTCLOUD_DATA_DIR environment variable
+      - AGENTCLOUD_SERVER environment variable
     """
 
     server_url: str = Field(
         default_factory=lambda: os.environ.get(
-            "AGENTYUN_SERVER", "http://127.0.0.1:18000"
+            "AGENTCLOUD_SERVER", "http://127.0.0.1:18000"
         )
     )
     data_dir: Path = Field(default_factory=_data_dir_default)

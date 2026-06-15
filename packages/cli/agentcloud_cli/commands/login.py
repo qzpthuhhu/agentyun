@@ -1,10 +1,10 @@
-"""agentyun login"""
+"""agentcloud login"""
 import click
 from rich.console import Console
 
-from agentyun import AgentCloud
-from agentyun.client import AuthError
-from agentyun.config import SDKConfig
+from agentcloud import AgentCloud
+from agentcloud.client import AuthError
+from agentcloud.config import SDKConfig
 
 from ._common import DEFAULT_SERVER, get_config, print_success, print_error
 
@@ -29,12 +29,12 @@ def login_cmd(key: str, server: str | None, data_dir: str | None):
 
     # If server wasn't provided, try to use existing creds file
     if not server:
-        from agentyun.client import Credentials
+        from agentcloud.client import Credentials
         existing = Credentials.load(cfg.credentials_path)
         if existing and existing.server_url:
             cfg = SDKConfig(server_url=existing.server_url, data_dir=cfg.data_dir)
 
-    from agentyun.client import Credentials
+    from agentcloud.client import Credentials
     creds = Credentials(key=key, key_id="", server_url=cfg.server_url)
 
     try:

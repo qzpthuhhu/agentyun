@@ -8,16 +8,16 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Cloud service settings.
 
-    Reads from environment variables prefixed with AGENTYUN_.
+    Reads from environment variables prefixed with AGENTCLOUD_.
     """
 
     # Service
-    service_name: str = "agentyun-cloud"
+    service_name: str = "agentcloud-cloud"
     debug: bool = False
     api_prefix: str = "/v1"
 
     # Database
-    database_url: str = "sqlite:///./agentyun.db"
+    database_url: str = "sqlite:///./agentcloud.db"
 
     # JWT for session tokens (issued after key login)
     jwt_secret: str = "CHANGE_ME_IN_PRODUCTION_USE_ENV_VAR"
@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["*"]
 
     class Config:
-        env_prefix = "AGENTYUN_"
+        env_prefix = "AGENTCLOUD_"
         env_file = ".env"
         case_sensitive = False
 

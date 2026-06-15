@@ -1,4 +1,4 @@
-"""agentyun server ..."""
+"""agentcloud server ..."""
 import os
 import subprocess
 import sys
@@ -13,7 +13,7 @@ from ._common import print_success, print_info, print_error
 console = Console()
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]  # agentyun/packages/cli/agentyun_cli/commands -> repo root
+REPO_ROOT = Path(__file__).resolve().parents[3]  # agentcloud/packages/cli/agentcloud_cli/commands -> repo root
 
 
 @click.group("server")

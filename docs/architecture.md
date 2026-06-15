@@ -7,8 +7,8 @@ Agent Cloud Drive is a key-based cloud memory layer for AI agents. The model is
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Python SDK  (agentyun)                                  │
-│  CLI  (agentyun login / sync / ls / share / restore)    │
+│  Python SDK  (agentcloud)                                  │
+│  CLI  (agentcloud login / sync / ls / share / restore)    │
 ├─────────────────────────────────────────────────────────┤
 │  Sync Daemon (本地常驻进程) [v0.2+]                       │
 │  Local Cache  (SQLite WAL)                               │
@@ -127,8 +127,8 @@ v0.1 supports SQLite + local disk (dev mode). v0.2+ adds Postgres + pgvector +
 S3-compatible storage. Production users should switch via env vars:
 
 ```
-AGENTYUN_DATABASE_URL=postgresql://...
-AGENTYUN_ASSET_STORAGE_DIR=/var/agentyun/assets
+AGENTCLOUD_DATABASE_URL=postgresql://...
+AGENTCLOUD_ASSET_STORAGE_DIR=/var/agentcloud/assets
 ```
 
 (Use S3 by switching the assets router to boto3; tracked for v0.2.)
@@ -137,7 +137,7 @@ AGENTYUN_ASSET_STORAGE_DIR=/var/agentyun/assets
 
 v0.1:
 - TLS via reverse proxy (Caddy / nginx / cloud LB).
-- JWT with HS256; rotate `AGENTYUN_JWT_SECRET` regularly.
+- JWT with HS256; rotate `AGENTCLOUD_JWT_SECRET` regularly.
 - At-rest encryption for asset files (filesystem / disk level).
 
 v0.2+:

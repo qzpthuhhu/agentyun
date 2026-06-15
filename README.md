@@ -1,4 +1,4 @@
-# Agent Cloud Drive
+# AgentCloud
 
 > Open-source, key-based cloud memory layer for AI agents.
 > 类似 WPS 云备份 / 百度网盘的"无缝多端同步"心智，但主用户是 Agent，不是人。
@@ -26,15 +26,15 @@
 - **Key = 身份**：没有账号体系，一个 key = 一个 agent 的完整身份
 - **后台自动同步**：本地操作 → 后台增量备份到云
 - **跨设备跨 agent**：输入同一个 key → 拉回历史记忆
-- **分享 = 把 key 给别人**（或用 `agentyun share create` 生成可撤销的子 token）
+- **分享 = 把 key 给别人**（或用 `agentcloud share create` 生成可撤销的子 token）
 
 ## 仓库结构
 
 ```
-agentyun/
+agentcloud/
 ├── packages/
-│   ├── sdk/        # Python SDK (agentyun)
-│   ├── cli/        # CLI 工具 (agentyun 命令)
+│   ├── sdk/        # Python SDK (agentcloud)
+│   ├── cli/        # CLI 工具 (agentcloud 命令)
 │   └── cloud/      # FastAPI 后端服务
 ├── docker-compose.yml
 ├── docs/
@@ -58,45 +58,45 @@ uvicorn app.main:app --reload --port 18000
 或直接用 CLI：
 
 ```bash
-agentyun server start
+agentcloud server start
 ```
 
 ### 2. 注册一个 agent
 
 ```bash
-agentyun register --label my-agent
+agentcloud register --label my-agent
 # 输出: 你的 master key (保存好!)
 ```
 
 ### 3. 写记忆 & 后台同步
 
 ```bash
-agentyun memory add "用户喜欢简洁回答" --type preference --tag user:zhang
-agentyun memory add "今天讨论了产品设计" --type fact --tag project
-agentyun sync daemon --start          # 后台自动 push/pull
-agentyun memory list
-agentyun memory search "用户偏好" --top 3
+agentcloud memory add "用户喜欢简洁回答" --type preference --tag user:zhang
+agentcloud memory add "今天讨论了产品设计" --type fact --tag project
+agentcloud sync daemon --start          # 后台自动 push/pull
+agentcloud memory list
+agentcloud memory search "用户偏好" --top 3
 ```
 
 ### 4. 跨设备 / 跨 agent
 
 ```bash
 # 设备 B
-agentyun login --key <KEY>
-agentyun sync daemon --start
-agentyun memory list  # 看到了!
+agentcloud login --key <KEY>
+agentcloud sync daemon --start
+agentcloud memory list  # 看到了!
 ```
 
 ### 5. 分享给特定人（v0.3 新）
 
 ```bash
 # 主人：创建分享
-agentyun share create --permissions read_memory --expires-in 86400 --label for-friend
+agentcloud share create --permissions read_memory --expires-in 86400 --label for-friend
 # 输出: share token (给对方一次)
 
 # 对方：消费
-agentyun share consume <TOKEN>
-agentyun share consume <TOKEN> -q "用户偏好什么"
+agentcloud share consume <TOKEN>
+agentcloud share consume <TOKEN> -q "用户偏好什么"
 ```
 
 ### 6. Web 时间线
@@ -133,7 +133,7 @@ OpenAPI 文档：`http://localhost:18000/docs`
 ## Python SDK
 
 ```python
-from agentyun import AgentCloud
+from agentcloud import AgentCloud
 
 # 注册（首次）
 ac = AgentCloud.register("http://your-server:8000", label="my-agent")
@@ -162,31 +162,31 @@ their_hits = shared.search("用户偏好", top_k=3)
 
 ```bash
 # 注册 / 登录
-agentyun register --label my-agent
-agentyun login --key <KEY>
-agentyun whoami
+agentcloud register --label my-agent
+agentcloud login --key <KEY>
+agentcloud whoami
 
 # 记忆
-agentyun memory add "..." --type preference --tag user
-agentyun memory list
-agentyun memory search "query" --top 5
+agentcloud memory add "..." --type preference --tag user
+agentcloud memory list
+agentcloud memory search "query" --top 5
 
 # 同步
-agentyun sync once
-agentyun sync daemon --start          # 后台运行（Ctrl+C 停）
-agentyun sync daemon --status
-agentyun sync daemon --stop
-agentyun status
+agentcloud sync once
+agentcloud sync daemon --start          # 后台运行（Ctrl+C 停）
+agentcloud sync daemon --status
+agentcloud sync daemon --stop
+agentcloud status
 
 # 分享（v0.3）
-agentyun share create --permissions read_memory --expires-in 86400 --label for-friend
-agentyun share list
-agentyun share revoke <share_id>
-agentyun share consume <TOKEN>
-agentyun share consume <TOKEN> -q "user preferences"
+agentcloud share create --permissions read_memory --expires-in 86400 --label for-friend
+agentcloud share list
+agentcloud share revoke <share_id>
+agentcloud share consume <TOKEN>
+agentcloud share consume <TOKEN> -q "user preferences"
 
 # Cloud 服务
-agentyun server start
+agentcloud server start
 ```
 
 ## 数据模型：Event Sourcing
@@ -230,7 +230,7 @@ shares (
 | **sqlite-vec** | SQLite dev mode（默认） | 10-100x 快 |
 | **pgvector** | Postgres 生产（默认） | ANN cosine distance |
 
-可强制指定：`AGENTYUN_VECTOR_BACKEND=auto|numpy|sqlite_vec|pgvector`。
+可强制指定：`AGENTCLOUD_VECTOR_BACKEND=auto|numpy|sqlite_vec|pgvector`。
 
 ### 冲突解决
 
@@ -241,7 +241,7 @@ v0.1-v0.3 使用 **Last-Write-Wins**。
 ### 开发模式（SQLite + 本地磁盘 + sqlite-vec）
 
 ```bash
-agentyun server start
+agentcloud server start
 # 等价于：
 cd packages/cloud && uvicorn app.main:app --reload
 ```
@@ -255,10 +255,10 @@ docker compose up -d
 环境变量：
 
 ```
-AGENTYUN_DATABASE_URL=postgresql://user:pass@host:5432/agentyun
-AGENTYUN_ASSET_STORAGE_DIR=/var/agentyun/assets
-AGENTYUN_JWT_SECRET=<change-me>
-AGENTYUN_VECTOR_BACKEND=pgvector  # or auto
+AGENTCLOUD_DATABASE_URL=postgresql://user:pass@host:5432/agentcloud
+AGENTCLOUD_ASSET_STORAGE_DIR=/var/agentcloud/assets
+AGENTCLOUD_JWT_SECRET=<change-me>
+AGENTCLOUD_VECTOR_BACKEND=pgvector  # or auto
 ```
 
 ## Roadmap

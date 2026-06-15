@@ -1,4 +1,4 @@
-"""agentyun status / whoami"""
+"""agentcloud status / whoami"""
 import json
 import click
 from rich.console import Console

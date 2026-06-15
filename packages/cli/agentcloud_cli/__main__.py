@@ -8,15 +8,15 @@ from .commands import register, login, sync, memory, status, server, share
 @click.group()
 @click.version_option()
 def main():
-    """Agent Cloud Drive - key-based cloud memory for AI agents.
+    """AgentCloud - key-based cloud memory for AI agents.
 
     Get started:
 
-        agentyun register --server http://your-server:8000
+        agentcloud register --server http://your-server:8000
 
-        agentyun memory add "用户喜欢简洁回答" --type preference
+        agentcloud memory add "用户喜欢简洁回答" --type preference
 
-        agentyun sync       # on another device, with the same key
+        agentcloud sync       # on another device, with the same key
     """
     pass
 

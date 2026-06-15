@@ -15,16 +15,16 @@ import pytest
 
 @pytest.fixture
 def tmp_data_dir():
-    return tempfile.mkdtemp(prefix="agentyun-test-")
+    return tempfile.mkdtemp(prefix="agentcloud-test-")
 
 
 def test_register_login_memory_sync(tmp_data_dir):
     """Full E2E: register, add memory, simulate second device, sync."""
-    from agentyun import AgentCloud, SDKConfig
-    from agentyun.client import Credentials
+    from agentcloud import AgentCloud, SDKConfig
+    from agentcloud.client import Credentials
     import json
 
-    server = os.environ.get("AGENTYUN_SERVER", "http://127.0.0.1:18000")
+    server = os.environ.get("AGENTCLOUD_SERVER", "http://127.0.0.1:18000")
 
     # Device A
     cfg_a = SDKConfig(server_url=server, data_dir=tmp_data_dir + "/A")
@@ -33,7 +33,7 @@ def test_register_login_memory_sync(tmp_data_dir):
 
     # Add memories
     eid_1 = ac_a.memory.add("用户喜欢简洁回答", type="preference", tags=["user:zhang"])
-    eid_2 = ac_a.memory.add("今天讨论了产品设计", type="fact", tags=["project:agentyun"])
+    eid_2 = ac_a.memory.add("今天讨论了产品设计", type="fact", tags=["project:agentcloud"])
     assert eid_1 > 0
     assert eid_2 > eid_1
 
@@ -58,10 +58,10 @@ def test_register_login_memory_sync(tmp_data_dir):
 
 def test_idempotent_memory_add(tmp_data_dir):
     """Same client_event_id should not create duplicate events."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
     import uuid
 
-    server = os.environ.get("AGENTYUN_SERVER", "http://127.0.0.1:18000")
+    server = os.environ.get("AGENTCLOUD_SERVER", "http://127.0.0.1:18000")
     cfg = SDKConfig(server_url=server, data_dir=tmp_data_dir + "/idem")
     ac = AgentCloud.register(server, label="idem", config=cfg)
 
@@ -72,10 +72,10 @@ def test_idempotent_memory_add(tmp_data_dir):
 
 def test_recovery_preserves_identity(tmp_data_dir):
     """Recover should issue a new key but keep the same key_id."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
     import httpx
 
-    server = os.environ.get("AGENTYUN_SERVER", "http://127.0.0.1:18000")
+    server = os.environ.get("AGENTCLOUD_SERVER", "http://127.0.0.1:18000")
 
     cfg = SDKConfig(server_url=server, data_dir=tmp_data_dir + "/recover")
     ac = AgentCloud.register(server, label="recover", config=cfg)

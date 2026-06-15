@@ -28,7 +28,7 @@ from .client import AgentCloud, AuthError, APIError
 from .store import LocalStore
 
 
-logger = logging.getLogger("agentyun.sync.daemon")
+logger = logging.getLogger("agentcloud.sync.daemon")
 
 
 # Sync intervals (seconds)
@@ -87,7 +87,7 @@ class SyncDaemon:
             self._stop_event.clear()
             self._thread = threading.Thread(
                 target=self._run,
-                name="agentyun-sync-daemon",
+                name="agentcloud-sync-daemon",
                 daemon=True,
             )
             self._thread.start()

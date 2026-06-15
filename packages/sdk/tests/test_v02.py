@@ -11,17 +11,17 @@ import pytest
 import requests
 
 
-SERVER = os.environ.get("AGENTYUN_SERVER", "http://127.0.0.1:18000")
+SERVER = os.environ.get("AGENTCLOUD_SERVER", "http://127.0.0.1:18000")
 
 
 @pytest.fixture
 def tmp_data_dir():
-    return tempfile.mkdtemp(prefix="agentyun-v02-")
+    return tempfile.mkdtemp(prefix="agentcloud-v02-")
 
 
 def test_daemon_pushes_locally_on_add(tmp_data_dir):
     """After ac.memory.add(), the daemon should auto-push within a few seconds."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/daemon", timeout_seconds=60)
     ac = AgentCloud.register(SERVER, label="daemon-push", config=cfg)
@@ -45,8 +45,8 @@ def test_daemon_pushes_locally_on_add(tmp_data_dir):
 
 def test_daemon_pulls_remote_updates(tmp_data_dir):
     """Daemon should auto-pull remote events created by other clients."""
-    from agentyun import AgentCloud, SDKConfig
-    from agentyun.client import Credentials
+    from agentcloud import AgentCloud, SDKConfig
+    from agentcloud.client import Credentials
     import json
 
     cfg_a = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/A", timeout_seconds=60)
@@ -75,7 +75,7 @@ def test_daemon_pulls_remote_updates(tmp_data_dir):
 
 def test_semantic_search_returns_relevant_hits(tmp_data_dir):
     """Semantic search should return semantically related memories."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/search", timeout_seconds=120)
     ac = AgentCloud.register(SERVER, label="semantic", config=cfg)
@@ -102,7 +102,7 @@ def test_web_home_renders():
 
 def test_web_timeline_with_key(tmp_data_dir):
     """Web UI timeline should render with valid key."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/web", timeout_seconds=60)
     ac = AgentCloud.register(SERVER, label="web-test", config=cfg)
@@ -119,7 +119,7 @@ def test_web_timeline_with_key(tmp_data_dir):
 
 def test_web_search_renders_hits(tmp_data_dir):
     """Web UI search should render scored hits."""
-    from agentyun import AgentCloud, SDKConfig
+    from agentcloud import AgentCloud, SDKConfig
 
     cfg = SDKConfig(server_url=SERVER, data_dir=tmp_data_dir + "/websearch", timeout_seconds=120)
     ac = AgentCloud.register(SERVER, label="web-search", config=cfg)

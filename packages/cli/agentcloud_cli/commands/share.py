@@ -1,4 +1,4 @@
-"""agentyun share ..."""
+"""agentcloud share ..."""
 import click
 from rich.console import Console
 from rich.panel import Panel
@@ -51,7 +51,7 @@ def share_create(permissions: str, expires_in: int | None, label: str | None,
         f"[bold yellow]⚠ Share token (SAVE THIS - shown only once!):[/bold yellow]\n"
         f"[cyan]{token}[/cyan]\n\n"
         f"[dim]On another machine:[/dim]\n"
-        f"  agentyun share consume {token}",
+        f"  agentcloud share consume {token}",
         title="Agent Cloud Drive — Share",
         border_style="green",
     ))
@@ -108,10 +108,10 @@ def share_consume(token: str, query: str | None, limit: int, top: int, server: s
     """Read someone else's memory via a share token (no credentials needed).
 
     Examples:
-        agentyun share consume <TOKEN>
-        agentyun share consume <TOKEN> -q "user preferences"
+        agentcloud share consume <TOKEN>
+        agentcloud share consume <TOKEN> -q "user preferences"
     """
-    from agentyun import AgentCloud
+    from agentcloud import AgentCloud
     server = server or DEFAULT_SERVER
     shared = AgentCloud.connect_share(token, server_url=server)
 

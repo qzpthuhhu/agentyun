@@ -330,7 +330,7 @@ class AgentCloud:
     Usage:
         # First time: register
         ac = AgentCloud.register(server_url="http://...", label="my-agent")
-        # Persist ac.credentials() to ~/.agentyun/credentials.json
+        # Persist ac.credentials() to ~/.agentcloud/credentials.json
 
         # Subsequent times: login with stored key
         ac = AgentCloud.from_credentials(creds)
@@ -430,7 +430,7 @@ class AgentCloud:
 
     @classmethod
     def load(cls, config: Optional[SDKConfig] = None) -> Optional["AgentCloud"]:
-        """Load credentials from default location (~/.agentyun/credentials.json).
+        """Load credentials from default location (~/.agentcloud/credentials.json).
 
         Returns None if no credentials found.
         """

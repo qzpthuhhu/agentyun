@@ -1,12 +1,12 @@
 [project]
-name = "agentyun-cloud"
+name = "agentcloud-cloud"
 version = "0.1.0"
 description = "Cloud backend for Agent Cloud Drive"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Agent Cloud", email = "dev@agentyun.dev"}
+    {name = "Agent Cloud", email = "dev@agentcloud.dev"}
 ]
 dependencies = [
     "fastapi>=0.100.0",
