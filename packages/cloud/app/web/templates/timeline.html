@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ label or "Timeline" }} · Agent Cloud Drive</title>
+    <link rel="stylesheet" href="/web/static/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <main class="container">
+        <header class="topbar">
+            <div class="brand">
+                <a href="/web" class="brand-name">Agent Cloud Drive</a>
+                <span class="brand-tag">v0.2</span>
+            </div>
+            <div class="who">
+                <span class="key-pill" title="{{ key_id }}">{{ key_id[:8] }}…</span>
+                {% if label %}<span class="label">{{ label }}</span>{% endif %}
+            </div>
+        </header>
+
+        <section class="grid">
+            <!-- LEFT: add + search -->
+            <aside class="side">
+                <div class="card">
+                    <h3>加记忆</h3>
+                    <form
+                        hx-post="/web/add"
+                        hx-target="#timeline"
+                        hx-swap="afterbegin"
+                        hx-on::after-request="this.reset()"
+                        class="add-form">
+                        <input type="hidden" name="token" value="{{ token }}">
+                        <textarea name="content" rows="3" placeholder="内容..." required></textarea>
+                        <div class="row">
+                            <select name="type">
+                                <option value="fact">fact</option>
+                                <option value="preference">preference</option>
+                                <option value="conversation">conversation</option>
+                                <option value="note">note</option>
+                                <option value="skill">skill</option>
+                            </select>
+                            <input type="text" name="tags" placeholder="tags (逗号分隔)">
+                        </div>
+                        <button type="submit" class="primary">添加</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>语义搜索</h3>
+                    <form method="get" action="/web/timeline" class="search-form">
+                        <input type="hidden" name="token" value="{{ token }}">
+                        <input type="text" name="q" value="{{ query or '' }}" placeholder="搜点什么..." required>
+                        <button type="submit">搜索</button>
+                    </form>
+                    {% if hits %}
+                        <div class="hits-meta">找到 {{ stats.hit_count }} 条结果</div>
+                    {% endif %}
+                </div>
+            </aside>
+
+            <!-- RIGHT: timeline -->
+            <section class="main">
+                {% if query %}
+                    {% if hits %}
+                        <div class="card search-results">
+                            <h3>搜索 "{{ query }}"</h3>
+                            <ul class="event-list">
+                                {% for hit in hits %}
+                                    {% set item = hit %}
+                                    {% include "_event.html" %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        <div class="card empty">
+                            <p>没有命中 "{{ query }}"</p>
+                            <a href="/web/timeline?token={{ token }}">返回时间线</a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <div class="card">
+                    <div class="timeline-header">
+                        <h3>时间线</h3>
+                        <span class="count">{{ stats.total_items }} 条</span>
+                    </div>
+                    <ul class="event-list" id="timeline">
+                        {% if items %}
+                            {% for item in items %}
+                                {% include "_event.html" %}
+                            {% endfor %}
+                        {% else %}
+                            <li class="empty">还没有记忆。从左边添加一条试试。</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+</html>

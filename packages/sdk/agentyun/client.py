@@ -102,7 +102,13 @@ class _MemoryAPI:
             client_event_id=client_event_id,
         )
 
-        # Push to remote
+        # If a daemon is running, just wake it — it'll handle the push.
+        daemon = getattr(self._c, "_daemon", None)
+        if daemon is not None and daemon.is_running():
+            daemon.wake()
+            return local.client_event_id  # remote_id will be set after sync
+
+        # No daemon: do a direct push (synchronous path).
         data = self._c._http.post(
             "/memory",
             json={
@@ -143,10 +149,35 @@ class _MemoryAPI:
             ))
         return items
 
-    def search(self, query: str, top_k: int = 5) -> List[MemoryItem]:
-        """Search memory. v0.1: simple substring filter on content.
-        v0.2 will add semantic/embedding-based search.
+    def search(self, query: str, top_k: int = 5, min_score: float = 0.0) -> List[MemoryItem]:
+        """Semantic search using server-side embeddings (cosine similarity).
+
+        Falls back to keyword search if the server doesn't support /memory/search.
         """
+        try:
+            data = self._c._http.post(
+                "/memory/search",
+                json={"query": query, "top_k": top_k, "min_score": min_score},
+            )
+        except APIError:
+            # Server too old (< v0.2) — fall back to keyword
+            return self._keyword_search(query, top_k)
+
+        hits = []
+        for h in data.get("hits", []):
+            hits.append(MemoryItem(
+                event_id=h["event_id"],
+                type="memory.add",
+                memory_type=h.get("memory_type", "fact"),
+                content=h["content"],
+                tags=h.get("tags", []),
+                meta={},
+                created_at=datetime.fromisoformat(h["created_at"].replace("Z", "+00:00")),
+            ))
+        return hits
+
+    def _keyword_search(self, query: str, top_k: int) -> List[MemoryItem]:
+        """Naive keyword fallback when semantic search is unavailable."""
         all_items = self.list(limit=500)
         q = query.lower()
         scored = []
@@ -209,6 +240,43 @@ class _SyncAPI:
                 "server_url": self._c.config.server_url,
             },
         }
+
+    def daemon_start(self, **kwargs) -> "SyncDaemon":
+        """Start a background sync daemon (returns the daemon instance).
+
+        Args:
+            push_interval: seconds between push ticks (default 1.0)
+            pull_interval: seconds between pull ticks (default 5.0)
+            batch_size: max events per push/pull batch (default 100)
+            retry_backoff: seconds to wait after a network error (default 5.0)
+
+        The daemon watches the local WAL and pushes changes within ~push_interval
+        seconds. It also polls for remote updates every pull_interval seconds.
+        """
+        from .daemon import SyncDaemon  # local import to avoid cycle
+
+        existing = getattr(self._c, "_daemon", None)
+        if existing is not None and existing.is_running():
+            return existing
+        daemon = SyncDaemon(self._c, **kwargs)
+        daemon.start()
+        self._c._daemon = daemon  # type: ignore[attr-defined]
+        return daemon
+
+    def daemon_stop(self, timeout: float = 5.0) -> bool:
+        """Stop the background sync daemon. Returns True if it was running."""
+        daemon = getattr(self._c, "_daemon", None)
+        if daemon is None:
+            return False
+        daemon.stop(timeout=timeout)
+        return True
+
+    def daemon_status(self) -> Optional[Dict[str, Any]]:
+        """Return daemon status (or None if daemon not started)."""
+        daemon = getattr(self._c, "_daemon", None)
+        if daemon is None:
+            return None
+        return daemon.status()
 
 
 class _HTTPClient:

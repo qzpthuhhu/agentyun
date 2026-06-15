@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Cloud Drive</title>
+    <link rel="stylesheet" href="/web/static/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <main class="container">
+        <header class="hero">
+            <h1>Agent Cloud Drive</h1>
+            <p class="subtitle">云端 agent 记忆 &middot; 跨设备同步</p>
+        </header>
+
+        <section class="card">
+            <h2>登录</h2>
+            <p class="hint">输入你的 master key 打开 Web 时间线。</p>
+            <form method="get" action="/web/timeline" class="key-form">
+                <input
+                    type="text"
+                    name="key"
+                    placeholder="例如: 9cM2iaBJXnmeRpkxGCWUuvzNjm1Eo7TigXbcjH3bT3sa"
+                    autocomplete="off"
+                    spellcheck="false"
+                    required>
+                <button type="submit" class="primary">打开时间线</button>
+            </form>
+            <p class="hint">
+                没有 key？先在终端跑 <code>agentyun register</code>，或者
+                <a href="/docs" target="_blank">查看 API 文档</a>。
+            </p>
+        </section>
+
+        <footer>
+            <span>v0.2 · Apache 2.0 · Agent Cloud Drive</span>
+        </footer>
+    </main>
+</body>
+</html>

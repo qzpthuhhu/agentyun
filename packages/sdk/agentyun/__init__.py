@@ -6,8 +6,9 @@ local SQLite WAL for offline-first behavior.
 from .client import AgentCloud, AgentCloudError
 from .memory import MemoryItem, MemoryType
 from .config import SDKConfig
+from .daemon import SyncDaemon
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "AgentCloud",
@@ -15,4 +16,5 @@ __all__ = [
     "MemoryItem",
     "MemoryType",
     "SDKConfig",
+    "SyncDaemon",
 ]
