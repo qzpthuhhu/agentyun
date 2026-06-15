@@ -108,37 +108,28 @@ def web_timeline(
     if q:
         try:
             from ..embed import get_embedder
-            from ..routers.memory import _search_vectors
-            import numpy as np
+            from ..vector_index import get_vector_index
             embedder = get_embedder()
-            candidates = []
-            event_lookup = {}
-            for e in db.query(models.Event).filter(
-                models.Event.key_id == current.key_id,
-                models.Event.type.in_(("memory.add", "memory.update")),
-            ).all():
-                p = e.payload or {}
-                vec = p.get("_embedding")
-                if vec is None:
-                    continue
-                candidates.append((e.event_id, vec))
-                event_lookup[e.event_id] = e
-            if candidates:
-                query_vec = embedder.embed_one(q)
-                top = _search_vectors(
-                    np.array(query_vec, dtype=np.float32),
-                    candidates,
-                    top_k=10,
-                    min_score=0.0,
-                )
-                for eid, score in top:
-                    e = event_lookup.get(eid)
-                    if not e:
-                        continue
+            index = get_vector_index()
+            query_vec = embedder.embed_one(q)
+            top = index.search(query_vec, top_k=20, min_score=0.0)
+            if top:
+                event_ids = [eid for eid, _ in top]
+                events = db.query(models.Event).filter(
+                    models.Event.event_id.in_(event_ids),
+                    models.Event.key_id == current.key_id,
+                ).all()
+                event_by_id = {e.event_id: e for e in events}
+                score_by_id = {eid: sc for eid, sc in top}
+                for eid in sorted(
+                    [eid for eid in event_ids if eid in event_by_id],
+                    key=lambda x: -score_by_id[x],
+                ):
+                    e = event_by_id[eid]
                     p = e.payload or {}
                     hits.append({
                         "event_id": eid,
-                        "score": round(score, 3),
+                        "score": round(score_by_id[eid], 3),
                         "type": p.get("type", "fact"),
                         "content": p.get("content", ""),
                         "tags": p.get("tags", []),

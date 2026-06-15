@@ -351,6 +351,8 @@ class AgentCloud:
         self._http = _HTTPClient(self)
         self.memory = _MemoryAPI(self)
         self.sync = _SyncAPI(self)
+        from .share import _ShareAPI
+        self.share = _ShareAPI(self)
 
     # ===== lifecycle =====
 
@@ -449,3 +451,16 @@ class AgentCloud:
         path = self.config.credentials_path
         self.credentials().save(path)
         return path
+
+    @staticmethod
+    def connect_share(token: str, server_url: Optional[str] = None) -> "_SharedAPI":
+        """Connect to another agent's memory via a share token (no credentials).
+
+        Usage:
+            shared = AgentCloud.connect_share("share-token-xyz", "http://server:8000")
+            timeline = shared.timeline(limit=20)
+            hits = shared.search("user preferences", top_k=5)
+        """
+        from .share import _SharedAPI
+        url = server_url or SDKConfig().server_url
+        return _SharedAPI(token=token, server_url=url)

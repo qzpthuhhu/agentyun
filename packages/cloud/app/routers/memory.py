@@ -20,7 +20,8 @@ from sqlalchemy import desc
 from .. import schemas, models
 from ..database import get_db
 from ..deps import get_current_key
-from ..embed import get_embedder, search_vectors as _search_vectors
+from ..embed import get_embedder
+from ..vector_index import get_vector_index
 
 
 logger = logging.getLogger("agentyun.memory")
@@ -106,6 +107,14 @@ def add_memory(
     db.add(ev)
     db.commit()
     db.refresh(ev)
+
+    # Also write to the vector index for fast ANN search.
+    try:
+        if "_embedding" in payload:
+            get_vector_index().add(ev.event_id, payload["_embedding"])
+    except Exception as e:
+        logger.warning("vector index write failed for event %d: %s", ev.event_id, e)
+
     return schemas.MemoryAddResponse(event_id=ev.event_id)
 
 
@@ -151,65 +160,52 @@ def search_memory(
     db: Session = Depends(get_db),
     current: models.Key = Depends(get_current_key),
 ):
-    """Semantic search: embed the query, return top_k memory items by cosine sim.
+    """Semantic search using the configured vector index.
 
-    v0.2 implementation: scans all memory events for the current key and computes
-    cosine similarity in numpy. For datasets >10k events/key, we'll move to
-    pgvector / sqlite-vec / faiss in v0.3.
+    v0.3: uses VectorIndex (auto-detected: numpy | sqlite_vec | pgvector).
+    All event_ids in the index belong to this user — we still post-filter by
+    key_id from the events table to be safe.
     """
     embedder = get_embedder()
+    index = get_vector_index()
 
-    # Fetch all memory events (could be paginated later)
+    # Embed the query
+    query_vec = embedder.embed_one(req.query)
+
+    # Query the vector index (returns event_id, score)
+    # Over-fetch to allow for post-filter by type/tag
+    top = index.search(query_vec, top_k=req.top_k * 5, min_score=req.min_score)
+    if not top:
+        return SearchResponse(query=req.query, hits=[])
+
+    # Filter by ownership + load event details
+    event_ids = [eid for eid, _ in top]
     events = db.query(models.Event).filter(
+        models.Event.event_id.in_(event_ids),
         models.Event.key_id == current.key_id,
         models.Event.type.in_(MEMORY_EVENT_TYPES),
     ).all()
-
-    # Build candidate list [(event_id, vector)]
-    candidates: List[tuple] = []
-    event_lookup = {}
-    for e in events:
-        p = e.payload or {}
-        vec = _get_embedding(p)
-        if vec is None:
-            # Try to backfill embedding for legacy events
-            try:
-                vec = embedder.embed_one(p.get("content", ""))
-                _store_embedding(p, vec)
-                e.payload = p
-                db.add(e)  # mark dirty
-            except Exception:
-                continue
-        candidates.append((e.event_id, vec))
-        event_lookup[e.event_id] = e
-
-    db.commit()  # persist backfilled embeddings
-
-    if not candidates:
-        return SearchResponse(query=req.query, hits=[])
-
-    query_vec = embedder.embed_one(req.query)
-    top = _search_vectors(
-        np.array(query_vec, dtype=np.float32),
-        candidates,
-        top_k=req.top_k * 3,  # over-fetch to allow filtering
-        min_score=req.min_score,
-    )
+    event_by_id = {e.event_id: e for e in events}
+    score_by_id = {eid: sc for eid, sc in top}
 
     hits: List[SearchHit] = []
-    for event_id, score in top:
+    # Re-sort by score desc, only including events we own
+    ordered = sorted(
+        [eid for eid in event_ids if eid in event_by_id],
+        key=lambda eid: -score_by_id[eid],
+    )
+    for event_id in ordered:
         if len(hits) >= req.top_k:
             break
-        e = event_lookup[event_id]
+        e = event_by_id[event_id]
         p = e.payload or {}
-        # Filter by type / tag if requested
         if req.type and p.get("type") != req.type:
             continue
         if req.tag and req.tag not in p.get("tags", []):
             continue
         hits.append(SearchHit(
             event_id=event_id,
-            score=round(score, 4),
+            score=round(score_by_id[event_id], 4),
             content=p.get("content", ""),
             memory_type=p.get("type", "fact"),
             tags=p.get("tags", []),

@@ -81,7 +81,7 @@ class Asset(Base):
 class Share(Base):
     """Sub-key / share token. Allows sharing memory with others.
 
-    v1.1 - schema defined early for future-proofing, not exposed in v0.1.
+    v0.3 - exposed via /v1/share.
     """
     __tablename__ = "shares"
 
@@ -89,6 +89,7 @@ class Share(Base):
     parent_key_id = Column(String, ForeignKey("keys.key_id"), nullable=False, index=True)
     token_hash = Column(LargeBinary, nullable=False, unique=True)
     permissions = Column(String, nullable=False, default="read")  # read | read_memory | full
+    label = Column(String, nullable=True)
     expires_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
     revoked_at = Column(DateTime(timezone=True), nullable=True)

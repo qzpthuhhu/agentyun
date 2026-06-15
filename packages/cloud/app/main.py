@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .database import init_db
-from .routers import auth, events, memory, assets
+from .routers import auth, events, memory, assets, share
 from .web import mount_web
 
 
@@ -61,6 +61,7 @@ app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(events.router, prefix=settings.api_prefix)
 app.include_router(memory.router, prefix=settings.api_prefix)
 app.include_router(assets.router, prefix=settings.api_prefix)
+app.include_router(share.router, prefix=settings.api_prefix)
 
 # Mount web UI
 mount_web(app)

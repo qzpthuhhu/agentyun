@@ -2,7 +2,7 @@
 import sys
 import click
 
-from .commands import register, login, sync, memory, status, server
+from .commands import register, login, sync, memory, status, server, share
 
 
 @click.group()
@@ -28,6 +28,7 @@ main.add_command(memory.memory_cmd)
 main.add_command(status.status_cmd)
 main.add_command(status.whoami_cmd)
 main.add_command(server.server_cmd)
+main.add_command(share.share_cmd)
 
 
 if __name__ == "__main__":
